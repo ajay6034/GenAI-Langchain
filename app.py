@@ -1,11 +1,13 @@
 from langchain.chat_models import init_chat_model
 from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
 import streamlit as st
 import os
 
 from dotenv import load_dotenv
+load_dotenv()
 
 # Langsmith Tracking
 
@@ -18,7 +20,7 @@ os.environ["LANGCHAIN_API_KEY"]= os.getenv("LANGCHAIN_API_KEY")
 prompt = ChatPromptTemplate.from_messages(
     [
 
-        ("system", "you are a helpful assistant. Please respond to the user queries")
+        ("system", "you are a helpful assistant. Please respond to the user queries"),
         ("user","Question:{question}")
     ]
 )
@@ -32,9 +34,9 @@ input_text = st.text_input("search the topic you want")
 
 llm = init_chat_model(model="gpt-3.5-turbo")
 
-model =init_chat_model.with_structured_output(prompt)
+output_parser  =StrOutputParser()
 
-chain = prompt|llm|model
+chain = prompt|llm|output_parser 
 
 if input_text:
     st.write(chain.invoke({'question':input_text}))
